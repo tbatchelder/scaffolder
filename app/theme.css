@@ -1,0 +1,224 @@
+/* Contains Root variables, Color tokens, Font tokens, Semantic tokens, Dark/Light mode */
+
+/* ------------------------- Base Palette Tokens ------------------------- */
+:root {
+	/* Mythic palette */
+	--unicorn-white: #ffffff;
+	--unicorn-blue: #7ecbff;
+	--dragon-yellow: #ffd54f;
+	--dragon-orange: #ff8a00;
+	--dragon-red: #d32f2f;
+
+	/* Neutrals and accents */
+	--ember-black: #1a1a1a;
+	--ember-2: #2a2a2a;
+	--silver: #d8d8d8;
+	--silver-2: #bfbfbf;
+
+	/* Semantic */
+	--success: #2ecc71;
+	--info: #3498db;
+	--warning: #f39c12;
+	--danger: #e74c3c;
+
+	/* Default mode tokens (Official BEAM) */
+	--bg: #1f1f1f; /* official background */
+	--text-on-bg: var(--silver);
+	--text-on-grad: var(--ember-black);
+	--card-border: var(--silver);
+	--card-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(0, 0, 0, 0.04));
+	--focus-ring: rgba(126, 203, 255, 0.18);
+}
+
+/* ------------------------- Global Layout ------------------------- */
+html,
+body {
+	background: var(--bg);
+	color: var(--text-on-bg);
+}
+
+/* ------------------------- Gradients (reusable) ------------------------- */
+.gradient-horizontal {
+	background: linear-gradient(
+		to right,
+		var(--unicorn-white) 0%,
+		var(--unicorn-white) 15%,
+		var(--unicorn-blue) 35%,
+		var(--dragon-yellow) 55%,
+		var(--dragon-orange) 75%,
+		var(--dragon-red) 90%,
+		var(--dragon-red) 100%
+	);
+}
+
+.gradient-radial {
+	background: radial-gradient(
+		circle,
+		var(--unicorn-white) 0%,
+		var(--unicorn-white) 20%,
+		var(--unicorn-blue) 45%,
+		var(--dragon-yellow) 65%,
+		var(--dragon-orange) 80%,
+		var(--dragon-red) 95%,
+		var(--dragon-red) 100%
+	);
+}
+
+.gradient-diagonal {
+	background: linear-gradient(
+		135deg,
+		var(--unicorn-white) 0%,
+		var(--unicorn-white) 15%,
+		var(--unicorn-blue) 35%,
+		var(--dragon-yellow) 55%,
+		var(--dragon-orange) 75%,
+		var(--dragon-red) 90%,
+		var(--dragon-red) 100%
+	);
+}
+
+/* ------------------------- Text Backdrops (for legibility) ------------------------- */
+.text-backdrop-light {
+	background: rgba(255, 255, 255, 0.72);
+	color: var(--ember-black);
+	padding: 0.4rem 0.6rem;
+	border-radius: 6px;
+	display: inline-block;
+}
+
+.text-backdrop-dark {
+	background: rgba(0, 0, 0, 0.48);
+	color: var(--silver);
+	padding: 0.4rem 0.6rem;
+	border-radius: 6px;
+	display: inline-block;
+}
+
+/* ------------------------- Buttons ------------------------- */
+.btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+	padding: 0.6rem 1rem;
+	border-radius: 10px;
+	font-weight: 600;
+	cursor: pointer;
+	transition:
+		transform 0.12s ease,
+		box-shadow 0.12s ease,
+		opacity 0.12s ease;
+	text-decoration: none;
+	border: none;
+}
+
+/* Primary uses mythic gradient */
+.btn-primary {
+	background: linear-gradient(135deg, var(--unicorn-blue), var(--dragon-orange));
+	color: var(--unicorn-white);
+	box-shadow: 0 8px 22px rgba(0, 0, 0, 0.36);
+}
+.btn-primary:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 12px 30px rgba(0, 0, 0, 0.44);
+}
+.btn-primary:active {
+	transform: translateY(0);
+}
+
+/* Secondary is neutral with mode-aware border */
+.btn-secondary {
+	background: transparent;
+	color: var(--text-on-bg);
+	border: 2px solid var(--card-border);
+	padding: 0.5rem 0.9rem;
+}
+.btn-secondary:hover {
+	background: rgba(255, 255, 255, 0.03);
+}
+
+/* Ghost */
+.btn-ghost {
+	background: transparent;
+	color: var(--text-on-bg);
+	border: 1px dashed var(--card-border);
+}
+
+/* Disabled */
+.btn[disabled] {
+	opacity: 0.5;
+	cursor: not-allowed;
+	transform: none;
+}
+
+/* ------------------------- Inputs ------------------------- */
+.input {
+	width: 100%;
+	padding: 0.6rem 0.8rem;
+	border-radius: 8px;
+	background: rgba(255, 255, 255, 0.02);
+	color: var(--text-on-bg);
+	border: 1px solid var(--card-border);
+	outline: none;
+	transition:
+		box-shadow 0.12s ease,
+		border-color 0.12s ease;
+}
+.input:focus {
+	border-color: var(--unicorn-blue);
+	box-shadow: 0 0 0 6px var(--focus-ring);
+}
+
+/* ------------------------- Alerts ------------------------- */
+.alert {
+	padding: 0.75rem 1rem;
+	border-radius: 8px;
+	border-left: 4px solid currentColor;
+	color: currentColor;
+	background: rgba(0, 0, 0, 0.04);
+	margin: 0.5rem 0;
+}
+.alert.info {
+	color: var(--info);
+	background: rgba(52, 152, 219, 0.06);
+}
+.alert.success {
+	color: var(--success);
+	background: rgba(46, 204, 113, 0.06);
+}
+.alert.warning {
+	color: var(--warning);
+	background: rgba(243, 156, 18, 0.06);
+}
+.alert.danger {
+	color: var(--danger);
+	background: rgba(231, 76, 60, 0.06);
+}
+
+/* ------------------------- Cards ------------------------- */
+.card {
+	border-radius: 12px;
+	padding: 1rem;
+	border: 2px solid var(--card-border);
+	background: var(--card-bg);
+	color: var(--text-on-grad);
+	box-shadow: 0 8px 26px rgba(0, 0, 0, 0.44);
+	min-width: 220px;
+}
+
+/* Card variants for explicit contrast */
+.card--light {
+	background: rgba(255, 255, 255, 0.02);
+}
+.card--dark {
+	background: rgba(0, 0, 0, 0.06);
+}
+
+/* ------------------------- Small UI and icons ------------------------- */
+.icon {
+	width: 20px;
+	height: 20px;
+	display: inline-block;
+	vertical-align: middle;
+	color: var(--text-on-bg);
+}
