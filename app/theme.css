@@ -21,8 +21,7 @@
 	--warning: #f39c12;
 	--danger: #e74c3c;
 
-	/* Default mode tokens (Official BEAM) */
-	--bg: #1f1f1f; /* official background */
+	--bg: #1f1f1f;
 	--text-on-bg: var(--silver);
 	--text-on-grad: var(--ember-black);
 	--card-border: var(--silver);
@@ -77,6 +76,21 @@ body {
 	);
 }
 
+/* ------------------------- Things to Keep ------------------------- */
+header {
+	display: flex;
+	align-items: center;
+	gap: 15px;
+	padding: 10px 20px;
+}
+
+.headerTitle {
+	font-size: 24px;
+	color: var(--text-on-grad);
+	text-shadow: 3px 3px 10px var(--dragon-orange);
+}
+
+/* ------------------------- Things to Determine IF We Keep ------------------------- */
 /* ------------------------- Text Backdrops (for legibility) ------------------------- */
 .text-backdrop-light {
 	background: rgba(255, 255, 255, 0.72);
@@ -220,5 +234,4 @@ body {
 	height: 20px;
 	display: inline-block;
 	vertical-align: middle;
-	color: var(--text-on-bg);
 }

@@ -17,6 +17,9 @@ const eslintConfig = defineConfig([
 		'out/**',
 		'build/**',
 		'next-env.d.ts',
+		// Add your Electron files here to stop the "forbidden require" errors
+		'main.js',
+		'preload.js',
 	]),
 ]);
 
