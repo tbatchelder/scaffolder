@@ -97,7 +97,7 @@ export default function HeroLogin({ onLogin }: HeroLoginProps) {
 									value={username}
 									onChange={e => setUsername(e.target.value)}
 									placeholder="e.g. Master_Builder"
-									className="w-full p-3 border-2 focus:outline-none font-bold"
+									className="w-full p-2 border-2 focus:outline-none font-bold"
 									style={{
 										backgroundColor: theme.palette.unicornWhite,
 										borderColor: theme.palette.emberBlack,
@@ -109,7 +109,7 @@ export default function HeroLogin({ onLogin }: HeroLoginProps) {
 							<div className="flex gap-3 pt-2">
 								<button
 									type="submit"
-									className="flex-1 py-3 font-bold uppercase border-2 hover:brightness-110 active:scale-95 transition-all"
+									className="flex-1 py-2 font-bold uppercase border-2 rounded-lg hover:brightness-110 active:scale-95 transition-all"
 									style={{
 										backgroundColor: theme.palette.dragonRed,
 										color: theme.palette.unicornWhite,
@@ -121,7 +121,7 @@ export default function HeroLogin({ onLogin }: HeroLoginProps) {
 								<button
 									type="button"
 									onClick={() => setIsModalOpen(false)}
-									className="px-4 py-3 font-bold uppercase border-2 transition-all"
+									className="px-4 py-2 font-bold uppercase border-2 rounded-lg transition-all"
 									style={{
 										backgroundColor: theme.palette.silver,
 										color: theme.palette.emberBlack,

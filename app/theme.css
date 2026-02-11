@@ -92,24 +92,24 @@ header {
 
 /* ------------------------- Things to Determine IF We Keep ------------------------- */
 /* ------------------------- Text Backdrops (for legibility) ------------------------- */
-.text-backdrop-light {
+/* .text-backdrop-light {
 	background: rgba(255, 255, 255, 0.72);
 	color: var(--ember-black);
 	padding: 0.4rem 0.6rem;
 	border-radius: 6px;
 	display: inline-block;
-}
+} */
 
-.text-backdrop-dark {
+/* .text-backdrop-dark {
 	background: rgba(0, 0, 0, 0.48);
 	color: var(--silver);
 	padding: 0.4rem 0.6rem;
 	border-radius: 6px;
 	display: inline-block;
-}
+} */
 
 /* ------------------------- Buttons ------------------------- */
-.btn {
+/* .btn {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
@@ -124,10 +124,10 @@ header {
 		opacity 0.12s ease;
 	text-decoration: none;
 	border: none;
-}
+} */
 
 /* Primary uses mythic gradient */
-.btn-primary {
+/* .btn-primary {
 	background: linear-gradient(135deg, var(--unicorn-blue), var(--dragon-orange));
 	color: var(--unicorn-white);
 	box-shadow: 0 8px 22px rgba(0, 0, 0, 0.36);
@@ -138,10 +138,10 @@ header {
 }
 .btn-primary:active {
 	transform: translateY(0);
-}
+} */
 
 /* Secondary is neutral with mode-aware border */
-.btn-secondary {
+/* .btn-secondary {
 	background: transparent;
 	color: var(--text-on-bg);
 	border: 2px solid var(--card-border);
@@ -149,24 +149,24 @@ header {
 }
 .btn-secondary:hover {
 	background: rgba(255, 255, 255, 0.03);
-}
+} */
 
 /* Ghost */
-.btn-ghost {
+/* .btn-ghost {
 	background: transparent;
 	color: var(--text-on-bg);
 	border: 1px dashed var(--card-border);
-}
+} */
 
 /* Disabled */
-.btn[disabled] {
+/* .btn[disabled] {
 	opacity: 0.5;
 	cursor: not-allowed;
 	transform: none;
-}
+} */
 
 /* ------------------------- Inputs ------------------------- */
-.input {
+/* .input {
 	width: 100%;
 	padding: 0.6rem 0.8rem;
 	border-radius: 8px;
@@ -181,10 +181,10 @@ header {
 .input:focus {
 	border-color: var(--unicorn-blue);
 	box-shadow: 0 0 0 6px var(--focus-ring);
-}
+} */
 
 /* ------------------------- Alerts ------------------------- */
-.alert {
+/* .alert {
 	padding: 0.75rem 1rem;
 	border-radius: 8px;
 	border-left: 4px solid currentColor;
@@ -207,10 +207,10 @@ header {
 .alert.danger {
 	color: var(--danger);
 	background: rgba(231, 76, 60, 0.06);
-}
+} */
 
 /* ------------------------- Cards ------------------------- */
-.card {
+/* .card {
 	border-radius: 12px;
 	padding: 1rem;
 	border: 2px solid var(--card-border);
@@ -218,20 +218,20 @@ header {
 	color: var(--text-on-grad);
 	box-shadow: 0 8px 26px rgba(0, 0, 0, 0.44);
 	min-width: 220px;
-}
+} */
 
 /* Card variants for explicit contrast */
-.card--light {
+/* .card--light {
 	background: rgba(255, 255, 255, 0.02);
 }
 .card--dark {
 	background: rgba(0, 0, 0, 0.06);
-}
+} */
 
 /* ------------------------- Small UI and icons ------------------------- */
-.icon {
+/* .icon {
 	width: 20px;
 	height: 20px;
 	display: inline-block;
 	vertical-align: middle;
-}
+} */

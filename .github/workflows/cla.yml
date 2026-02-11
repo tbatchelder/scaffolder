@@ -1,0 +1,18 @@
+name: CLA Check
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  cla:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check CLA Signature
+        uses: cla-assistant/github-action@v2
+        with:
+          path-to-signatures: 'cla/signatures.json'
+          path-to-document: 'cla/CLA.md'
+          branch: 'main'
+          allowlist: 'TimothyBatchelder'
