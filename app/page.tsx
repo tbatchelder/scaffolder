@@ -1,92 +1,195 @@
-// export default function Home() {
-// 	return (
-// 		<>
-// 			<header className="gradient-diagonal">
-// 				<Image src="/beam-logo.svg" className="logo" alt="Logo" width={30} height={30} />
-// 				<Image src="/logo.png" className="logo" alt="Logo" width={30} height={30} />
-// 				<h1>Scaffolder</h1>
-// 			</header>
-// 			<Image src="/hero.png" alt="Hero Image" width={600} height={600} />
-// 		</>
-// 	);
-// }
-
 'use client';
 
-import { useState } from 'react';
-import HeroLogin from './components/HeroLogin';
-import ProjectDropdown from './components/Header/ProjectDropdown';
-import GlobalSettings from './components/Header/Settings';
-import UserProfile from './components/Header/UserProfile';
-import Image from 'next/image';
+import { useState, useEffect } from 'react';
+import { theme } from './lib/theme';
+import { MOCK_USERS } from './lib/mockData';
+import HeroStage from './components/Login/HeroStage';
+import ViewContainer from './components/Login/ViewContainer';
+import FirstRunPanel from './components/Login/FirstRunPanel';
+import NewSitePanel from './components/Login/NewSitePanel';
+import GPSPanel from './components/Login/GPSPanel';
+import ClockInPanel from './components/Login/ClockInPanel';
 
-export default function ScaffolderPage() {
-	// Always starts as null. No memory, no unauthorized access.
+export default function Home() {
+	const [isOpened, setIsOpened] = useState(false);
+	const [showHero, setShowHero] = useState(true);
 	const [currentUser, setCurrentUser] = useState<string | null>(null);
+	const [hasPersistentData, setHasPersistentData] = useState(false);
 
-	/**
-	 * Handles folder verification and session start.
-	 * This runs every time the user enters their name.
-	 */
-	const handleLogin = async (username: string) => {
-		try {
-			if (!username.trim()) return;
+	const [currentView, setCurrentView] = useState<
+		'gate' | 'first-run' | 'new-site' | 'gps' | 'clock-in' | 'workshop'
+	>('gate');
 
-			// Tell Electron to find or create the workshop folder for this specific user
-			const success = await window.electronAPI.createUserID(username);
+	// ─── ONE-WAY GATE FLOW ───────────────────────────────────────────────────
+	// Once the hero doors open, we transition away from the gate forever (until restart).
+	// Timeline:
+	//   0ms: User clicks → isOpened = true → doors slide open
+	//   700ms: Doors fully open → fade out hero
+	//   1000ms: Hero gone → fade in the next view (FirstRun or ClockIn)
+	// ─────────────────────────────────────────────────────────────────────────
 
-			if (success) {
-				// Log them in for this session only
-				setCurrentUser(username);
-			} else {
-				// Slightly humorous error handling for the user
-				alert("The workshop door is jammed. Couldn't verify your user folder.");
-			}
-		} catch (error) {
-			console.error('Login sequence failed:', error);
+	useEffect(() => {
+		if (isOpened) {
+			// Wait for door animation to finish (700ms) + breathing room (200ms)
+			const heroFadeTimer = setTimeout(() => {
+				setShowHero(false);
+				// Determine where the user goes after passing through the gate
+				setCurrentView(hasPersistentData ? 'clock-in' : 'first-run');
+			}, 900);
+
+			return () => clearTimeout(heroFadeTimer);
 		}
-	};
+	}, [isOpened, hasPersistentData]);
 
-	const handleLogout = () => {
-		// Immediate wipe of session state
-		setCurrentUser(null);
-	};
-
+	// ─── MAIN RENDER ────────────────────────────────────────────────────────
 	return (
-		<>
-			{!currentUser ? (
-				<HeroLogin onLogin={handleLogin} />
-			) : (
-				<div className="flex flex-col h-screen bg-stone-50 text-stone-900">
-					{/* --- HEADER --- */}
-					<header className="flex items-center justify-between gradient-diagonal">
-						<div className="flex items-center gap-4">
-							<div className="flex items-center gap-2">
-								{/* Visual "Branding" baked in */}
-								<Image src="/beam-logo.svg" className="logo" alt="Logo" width={30} height={30} />
-								<Image src="/logo.png" className="logo" alt="Logo" width={30} height={30} />
-								<h1 className="headerTitle">Scaffolder</h1>
-							</div>
-							<div className="h-6 w-px bg-stone-300 mx-2" />
-							<ProjectDropdown currentUser={currentUser} />
-						</div>
+		<main
+			className="min-h-screen flex items-center justify-center gradient-diagonal relative"
+			style={{
+				backgroundColor: theme.layout.background,
+				color: theme.palette.silver,
+			}}
+		>
+			{/* ═══ THE GATE (ONE-WAY) ════════════════════════════════════════ */}
+			{showHero && (
+				<div
+					className="absolute inset-0 flex items-center justify-center transition-opacity duration-300"
+					style={{ opacity: isOpened && !showHero ? 0 : 1 }}
+				>
+					<HeroStage isOpen={isOpened} onOpen={() => setIsOpened(true)}>
+						{/* Content behind the doors (not visible until open due to door images covering) */}
+						<div className="opacity-0">Placeholder</div>
+					</HeroStage>
 
-						<div className="flex items-center gap-4">
-							<GlobalSettings />
-							<UserProfile username={currentUser} onLogout={handleLogout} />
+					{/* Instruction text */}
+					{!isOpened && (
+						<div className="fixed bottom-10 animate-bounce text-white font-bold uppercase tracking-widest opacity-50">
+							Click to Start Scaffolding
 						</div>
-					</header>
-
-					{/* --- MAIN WORKSHOP AREA --- */}
-					<main className="flex flex-1 overflow-hidden">
-						{/* Nav and Work Area go here in the next phase */}
-						<div className="flex-1 flex flex-col items-center justify-center text-stone-400">
-							<p className="italic">Workshop is open, {currentUser}.</p>
-							<p className="text-sm">Select a project above to get to work.</p>
-						</div>
-					</main>
+					)}
 				</div>
 			)}
-		</>
+
+			{/* ═══ POST-GATE VIEWS (FADE IN AFTER HERO EXITS) ════════════════ */}
+			{!showHero && (
+				<div className="animate-in fade-in duration-500" style={{ animationDelay: '100ms' }}>
+					{currentView === 'first-run' && (
+						<ViewContainer backgroundImage="/first-gps.png">
+							<FirstRunPanel
+								onNew={() => setCurrentView('new-site')}
+								onGPS={() => setCurrentView('gps')}
+							/>
+						</ViewContainer>
+					)}
+
+					{currentView === 'new-site' && (
+						<ViewContainer backgroundImage="/new-site.png">
+							<div className="text-center">
+								<h2 className="text-3xl font-black uppercase text-white mb-4">
+									Welcome to your new construction site
+								</h2>
+								<p className="text-sm opacity-70 text-white mb-6">
+									Tell us your name and were to start building
+								</p>
+								<button
+									className="px-6 py-3 bg-white/10 rounded-lg hover:bg-white/20 transition-colors border border-white/30 text-white font-bold uppercase text-sm"
+									onClick={() => setCurrentView('first-run')}
+								>
+									← Back
+								</button>
+							</div>
+						</ViewContainer>
+					)}
+
+					{currentView === 'gps' && (
+						<ViewContainer backgroundImage="/gps.png">
+							<div className="text-center">
+								<h2 className="text-3xl font-black uppercase text-white mb-4">
+									GPS — Locate Existing Site
+								</h2>
+								<p className="text-sm opacity-70 text-white mb-6">
+									Point us to your project folder
+								</p>
+								<button
+									className="px-6 py-3 bg-white/10 rounded-lg hover:bg-white/20 transition-colors border border-white/30 text-white font-bold uppercase text-sm"
+									onClick={() => setCurrentView('first-run')}
+								>
+									← Back
+								</button>
+							</div>
+						</ViewContainer>
+					)}
+
+					{currentView === 'clock-in' && (
+						<ViewContainer backgroundImage="/clock-in-background.png">
+							<div className="text-center">
+								<h2 className="text-3xl font-black uppercase text-white mb-4">
+									Clock In Personnel
+								</h2>
+								<p className="text-sm opacity-70 text-white mb-6">
+									Select your user to enter the workshop
+								</p>
+								{/* User selection cards would go here */}
+								<button
+									className="mt-4 px-6 py-3 bg-white/10 rounded-lg hover:bg-white/20 transition-colors border border-white/30 text-white font-bold uppercase text-sm"
+									onClick={() => setCurrentView('workshop')}
+								>
+									Enter Workshop
+								</button>
+							</div>
+						</ViewContainer>
+					)}
+
+					{currentView === 'workshop' && (
+						<div className="absolute inset-0 w-screen h-screen">
+							{/* Full app UI here - no ViewContainer */}
+							<WorkshopApp currentUser={currentUser} />
+						</div>
+					)}
+				</div>
+			)}
+
+			{/* ═══ DEBUG TOOLBELT ════════════════════════════════════════════ */}
+			<div
+				className="fixed bottom-4 left-4 p-4 border-2 border-dashed opacity-30 hover:opacity-100 transition-opacity bg-black text-[10px] font-mono z-50"
+				style={{ borderColor: theme.palette.dragonYellow }}
+			>
+				<p className="mb-2 text-dragon-yellow uppercase font-bold text-center">Admin Debug</p>
+				<div className="flex flex-col gap-2">
+					<button onClick={() => setHasPersistentData(!hasPersistentData)}>
+						TOGGLE DATA: {hasPersistentData ? 'YES' : 'NO'}
+					</button>
+					<button
+						onClick={() => {
+							if (currentUser) setCurrentUser(null);
+							else setCurrentUser(MOCK_USERS[0].username);
+						}}
+					>
+						USER: {currentUser ?? 'NONE'}
+					</button>
+					<button
+						onClick={() => {
+							setShowHero(true);
+							setIsOpened(false);
+							setCurrentView('gate');
+						}}
+					>
+						RESET TO GATE
+					</button>
+					<button onClick={() => setCurrentView('first-run')}>VIEW: FIRST RUN</button>
+					<button onClick={() => setCurrentView('gps')}>VIEW: GPS</button>
+					<button onClick={() => setCurrentView('clock-in')}>VIEW: CLOCK IN</button>
+					<button onClick={() => setCurrentView('workshop')}>VIEW: WORKSHOP</button>
+					<button
+						onClick={() => {
+							localStorage.clear();
+							window.location.reload();
+						}}
+					>
+						FULL RESET
+					</button>
+				</div>
+			</div>
+		</main>
 	);
 }

@@ -1,5 +1,7 @@
 # Scaffolder
 
+![License: MIT + Commons Clause](https://img.shields.io/badge/license-MIT%20%2B%20Commons%20Clause-blue) ![CLA Required](https://img.shields.io/badge/CLA-required-orange) ![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen)
+
 Scaffolder is a creative ops and project definition tool that helps you build the structural, aesthetic, and functional scaffolding your AI agents need to execute complex projects.
 
 Before you build, you scaffold.

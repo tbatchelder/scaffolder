@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import './theme.css';
 
 export const metadata: Metadata = {
 	title: 'Scaffolder',
@@ -16,7 +15,7 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang="en">
-			<body>{children}</body>
+			<body style={{ fontFamily: 'var(--font-sans)' }}>{children}</body>
 		</html>
 	);
 }
