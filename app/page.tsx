@@ -9,6 +9,7 @@ import ViewContainer from './components/Login/ViewContainer';
 import NewSitePanel from './components/Login/NewSitePanel';
 import GPSPanel from './components/Login/GPSPanel';
 import ClockInPanel from './components/Login/ClockInPanel';
+import Workshop from './components/Main/Workshop';
 
 export default function Home() {
 	// ─── WORKSHOP CONTEXT ────────────────────────────────────────────────────
@@ -137,29 +138,7 @@ export default function Home() {
 					)}
 
 					{/* WORKSHOP — FULLSCREEN, NO VIEWCONTAINER */}
-					{currentView === 'workshop' && (
-						<div className="absolute inset-0 w-screen h-screen bg-gradient-to-br from-stone-900 via-stone-800 to-stone-900">
-							<div className="w-full h-full flex items-center justify-center">
-								<div className="text-center">
-									<h1 className="text-5xl font-black uppercase text-white mb-4">Workshop Active</h1>
-									{currentUserData && (
-										<>
-											<p className="text-xl text-white/70 mb-2">
-												Logged in as{' '}
-												<span className="text-white font-bold">{currentUserData.username}</span>
-											</p>
-											<p className="text-sm text-white/50">
-												Last Project: {currentUserData.lastProject}
-											</p>
-										</>
-									)}
-									<p className="text-sm opacity-50 mt-8 italic text-white/30">
-										Main app interface goes here
-									</p>
-								</div>
-							</div>
-						</div>
-					)}
+					{currentView === 'workshop' && <Workshop />}
 				</div>
 			)}
 
