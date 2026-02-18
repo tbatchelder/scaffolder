@@ -2,19 +2,22 @@
 
 import { useState, useEffect } from 'react';
 import { theme } from './lib/theme';
-import { MOCK_USERS } from './lib/mockData';
+import { useWorkshop } from './contexts/WorkshopContext';
 import HeroStage from './components/Login/HeroStage';
-import ViewContainer from './components/Login/ViewContainer';
 import FirstRunPanel from './components/Login/FirstRunPanel';
+import ViewContainer from './components/Login/ViewContainer';
 import NewSitePanel from './components/Login/NewSitePanel';
 import GPSPanel from './components/Login/GPSPanel';
 import ClockInPanel from './components/Login/ClockInPanel';
 
 export default function Home() {
+	// ─── WORKSHOP CONTEXT ────────────────────────────────────────────────────
+	// const { hasPersistentData, isLoggedIn, getCurrentUserData } = useWorkshop();
+	const { hasPersistentData, getCurrentUserData, reset, setRootPath, setUsers } = useWorkshop();
+
+	// ─── LOCAL UI STATE ──────────────────────────────────────────────────────
 	const [isOpened, setIsOpened] = useState(false);
 	const [showHero, setShowHero] = useState(true);
-	const [currentUser, setCurrentUser] = useState<string | null>(null);
-	const [hasPersistentData, setHasPersistentData] = useState(false);
 
 	const [currentView, setCurrentView] = useState<
 		'gate' | 'first-run' | 'new-site' | 'gps' | 'clock-in' | 'workshop'
@@ -42,6 +45,32 @@ export default function Home() {
 	}, [isOpened, hasPersistentData]);
 
 	// ─── MAIN RENDER ────────────────────────────────────────────────────────
+	const currentUserData = getCurrentUserData();
+
+	// ─── DEBUG HELPERS ───────────────────────────────────────────────────────
+	// Jump directly to any view, bypassing the hero gate entirely
+	const debugGoTo = (view: typeof currentView) => {
+		setShowHero(false);
+		setIsOpened(false);
+		setCurrentView(view);
+	};
+
+	// Seed mock persistent data so clock-in can be tested without going through GPS
+	const debugSeedData = () => {
+		setRootPath('/mock/BEAM/Scaffolder');
+		setUsers([
+			{ username: 'Chief_Architect', lastProject: 'Block_A', projects: ['Block_A', 'Block_B'] },
+			{ username: 'Site_Foreman', lastProject: 'Block_B', projects: ['Block_B'] },
+			{ username: 'Apprentice', lastProject: 'Block_A', projects: ['Block_A'] },
+		]);
+	};
+
+	// Full wipe — clears context + localStorage then reloads
+	const debugFullReset = () => {
+		reset();
+		window.location.reload();
+	};
+
 	return (
 		<main
 			className="min-h-screen flex items-center justify-center gradient-diagonal relative"
@@ -64,7 +93,7 @@ export default function Home() {
 					{/* Instruction text */}
 					{!isOpened && (
 						<div className="fixed bottom-10 animate-bounce text-white font-bold uppercase tracking-widest opacity-50">
-							Click to Start Scaffolding
+							Click to Open Workshop
 						</div>
 					)}
 				</div>
@@ -84,66 +113,51 @@ export default function Home() {
 
 					{currentView === 'new-site' && (
 						<ViewContainer backgroundImage="/new-site.png">
-							<div className="text-center">
-								<h2 className="text-3xl font-black uppercase text-white mb-4">
-									Welcome to your new construction site
-								</h2>
-								<p className="text-sm opacity-70 text-white mb-6">
-									Tell us your name and were to start building
-								</p>
-								<button
-									className="px-6 py-3 bg-white/10 rounded-lg hover:bg-white/20 transition-colors border border-white/30 text-white font-bold uppercase text-sm"
-									onClick={() => setCurrentView('first-run')}
-								>
-									← Back
-								</button>
-							</div>
+							<NewSitePanel
+								onComplete={() => setCurrentView('workshop')}
+								onBack={() => setCurrentView('first-run')}
+							/>
 						</ViewContainer>
 					)}
 
 					{currentView === 'gps' && (
 						<ViewContainer backgroundImage="/gps.png">
-							<div className="text-center">
-								<h2 className="text-3xl font-black uppercase text-white mb-4">
-									GPS — Locate Existing Site
-								</h2>
-								<p className="text-sm opacity-70 text-white mb-6">
-									Point us to your project folder
-								</p>
-								<button
-									className="px-6 py-3 bg-white/10 rounded-lg hover:bg-white/20 transition-colors border border-white/30 text-white font-bold uppercase text-sm"
-									onClick={() => setCurrentView('first-run')}
-								>
-									← Back
-								</button>
-							</div>
+							<GPSPanel
+								onFound={() => setCurrentView('clock-in')}
+								onNotFound={() => setCurrentView('new-site')}
+								onBack={() => setCurrentView('first-run')}
+							/>
 						</ViewContainer>
 					)}
 
 					{currentView === 'clock-in' && (
-						<ViewContainer backgroundImage="/clock-in-background.png">
-							<div className="text-center">
-								<h2 className="text-3xl font-black uppercase text-white mb-4">
-									Clock In Personnel
-								</h2>
-								<p className="text-sm opacity-70 text-white mb-6">
-									Select your user to enter the workshop
-								</p>
-								{/* User selection cards would go here */}
-								<button
-									className="mt-4 px-6 py-3 bg-white/10 rounded-lg hover:bg-white/20 transition-colors border border-white/30 text-white font-bold uppercase text-sm"
-									onClick={() => setCurrentView('workshop')}
-								>
-									Enter Workshop
-								</button>
-							</div>
+						<ViewContainer backgroundImage="/clock-in.png">
+							<ClockInPanel onComplete={() => setCurrentView('workshop')} />
 						</ViewContainer>
 					)}
 
+					{/* WORKSHOP — FULLSCREEN, NO VIEWCONTAINER */}
 					{currentView === 'workshop' && (
-						<div className="absolute inset-0 w-screen h-screen">
-							{/* Full app UI here - no ViewContainer */}
-							<WorkshopApp currentUser={currentUser} />
+						<div className="absolute inset-0 w-screen h-screen bg-gradient-to-br from-stone-900 via-stone-800 to-stone-900">
+							<div className="w-full h-full flex items-center justify-center">
+								<div className="text-center">
+									<h1 className="text-5xl font-black uppercase text-white mb-4">Workshop Active</h1>
+									{currentUserData && (
+										<>
+											<p className="text-xl text-white/70 mb-2">
+												Logged in as{' '}
+												<span className="text-white font-bold">{currentUserData.username}</span>
+											</p>
+											<p className="text-sm text-white/50">
+												Last Project: {currentUserData.lastProject}
+											</p>
+										</>
+									)}
+									<p className="text-sm opacity-50 mt-8 italic text-white/30">
+										Main app interface goes here
+									</p>
+								</div>
+							</div>
 						</div>
 					)}
 				</div>
@@ -154,39 +168,82 @@ export default function Home() {
 				className="fixed bottom-4 left-4 p-4 border-2 border-dashed opacity-30 hover:opacity-100 transition-opacity bg-black text-[10px] font-mono z-50"
 				style={{ borderColor: theme.palette.dragonYellow }}
 			>
-				<p className="mb-2 text-dragon-yellow uppercase font-bold text-center">Admin Debug</p>
-				<div className="flex flex-col gap-2">
-					<button onClick={() => setHasPersistentData(!hasPersistentData)}>
-						TOGGLE DATA: {hasPersistentData ? 'YES' : 'NO'}
-					</button>
+				<p
+					className="mb-2 uppercase font-bold text-center"
+					style={{ color: theme.palette.dragonYellow }}
+				>
+					Admin Debug
+				</p>
+
+				{/* Status readout */}
+				<div className="mb-3 space-y-0.5 text-white/60 border-b border-white/10 pb-2">
+					<p>
+						HERO: {showHero ? 'VISIBLE' : 'GONE'} / OPENED: {isOpened ? 'YES' : 'NO'}
+					</p>
+					<p>VIEW: {currentView.toUpperCase()}</p>
+					<p>DATA: {hasPersistentData ? 'YES' : 'NO'}</p>
+					<p>USER: {getCurrentUserData()?.username ?? 'NONE'}</p>
+				</div>
+
+				{/* View jumping — bypasses hero gate entirely */}
+				<div className="flex flex-col gap-1.5">
+					<p className="text-white/40 uppercase text-[9px] tracking-wider">Jump to view</p>
 					<button
-						onClick={() => {
-							if (currentUser) setCurrentUser(null);
-							else setCurrentUser(MOCK_USERS[0].username);
-						}}
-					>
-						USER: {currentUser ?? 'NONE'}
-					</button>
-					<button
+						className="text-left px-2 py-1 hover:bg-white/10 rounded transition-colors text-white/70"
 						onClick={() => {
 							setShowHero(true);
 							setIsOpened(false);
 							setCurrentView('gate');
 						}}
 					>
-						RESET TO GATE
+						→ GATE (reset hero)
 					</button>
-					<button onClick={() => setCurrentView('first-run')}>VIEW: FIRST RUN</button>
-					<button onClick={() => setCurrentView('gps')}>VIEW: GPS</button>
-					<button onClick={() => setCurrentView('clock-in')}>VIEW: CLOCK IN</button>
-					<button onClick={() => setCurrentView('workshop')}>VIEW: WORKSHOP</button>
 					<button
-						onClick={() => {
-							localStorage.clear();
-							window.location.reload();
-						}}
+						className="text-left px-2 py-1 hover:bg-white/10 rounded transition-colors text-white/70"
+						onClick={() => debugGoTo('first-run')}
 					>
-						FULL RESET
+						→ FIRST RUN
+					</button>
+					<button
+						className="text-left px-2 py-1 hover:bg-white/10 rounded transition-colors text-white/70"
+						onClick={() => debugGoTo('new-site')}
+					>
+						→ NEW SITE
+					</button>
+					<button
+						className="text-left px-2 py-1 hover:bg-white/10 rounded transition-colors text-white/70"
+						onClick={() => debugGoTo('gps')}
+					>
+						→ GPS
+					</button>
+					<button
+						className="text-left px-2 py-1 hover:bg-white/10 rounded transition-colors text-white/70"
+						onClick={() => debugGoTo('clock-in')}
+					>
+						→ CLOCK IN
+					</button>
+					<button
+						className="text-left px-2 py-1 hover:bg-white/10 rounded transition-colors text-white/70"
+						onClick={() => debugGoTo('workshop')}
+					>
+						→ WORKSHOP
+					</button>
+
+					{/* Data controls */}
+					<p className="text-white/40 uppercase text-[9px] tracking-wider mt-2">Data controls</p>
+					<button
+						className="text-left px-2 py-1 hover:bg-white/10 rounded transition-colors"
+						style={{ color: theme.palette.dragonYellow }}
+						onClick={debugSeedData}
+					>
+						⚡ SEED MOCK USERS
+					</button>
+					<button
+						className="text-left px-2 py-1 hover:bg-white/10 rounded transition-colors"
+						style={{ color: theme.palette.dragonRed }}
+						onClick={debugFullReset}
+					>
+						✕ FULL RESET
 					</button>
 				</div>
 			</div>

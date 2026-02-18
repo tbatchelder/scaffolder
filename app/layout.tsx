@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import { WorkshopProvider } from './contexts/WorkshopContext';
 
 export const metadata: Metadata = {
 	title: 'Scaffolder',
@@ -15,7 +16,9 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang="en">
-			<body style={{ fontFamily: 'var(--font-sans)' }}>{children}</body>
+			<body style={{ fontFamily: 'var(--font-sans)' }}>
+				<WorkshopProvider>{children}</WorkshopProvider>
+			</body>
 		</html>
 	);
 }
