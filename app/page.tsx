@@ -9,7 +9,7 @@ import ViewContainer from './components/Login/ViewContainer';
 import NewSitePanel from './components/Login/NewSitePanel';
 import GPSPanel from './components/Login/GPSPanel';
 import ClockInPanel from './components/Login/ClockInPanel';
-import Workshop from './components/Main/Workshop';
+import Workshop from './components/Workshop/Workshop';
 
 export default function Home() {
 	// ─── WORKSHOP CONTEXT ────────────────────────────────────────────────────

@@ -224,6 +224,9 @@ import Image from 'next/image';
 import WorkshopNavigation from './WorkshopNavigation';
 import ContentRenderer from './ContentRenderer';
 import { contentFiles } from '../../data/Formenginedata';
+import { StyleProvider } from '../../contexts/StyleContext';
+import { StyleEditor } from './StyleEditor';
+import { STYLE_EDITOR_KEY } from '../../data/Formenginedata';
 
 function WorkshopInner() {
 	const { getCurrentUserData, setCurrentUser } = useWorkshop();
@@ -390,7 +393,11 @@ function WorkshopInner() {
 						color: theme.palette.silver,
 					}}
 				>
-					<ContentRenderer content={content} />
+					{activeContent === STYLE_EDITOR_KEY ? (
+						<StyleEditor />
+					) : (
+						<ContentRenderer content={content} />
+					)}
 				</main>
 			</div>
 
@@ -415,8 +422,10 @@ function WorkshopInner() {
 // Wrap WorkshopInner with ProjectProvider so form engine has access to project context
 export default function Workshop() {
 	return (
-		<ProjectProvider>
-			<WorkshopInner />
-		</ProjectProvider>
+		<StyleProvider>
+			<ProjectProvider>
+				<WorkshopInner />
+			</ProjectProvider>
+		</StyleProvider>
 	);
 }
