@@ -295,6 +295,7 @@ export default function WorkshopNavigation({ onDepthChange, onSelect }: Workshop
 	const [expanded, setExpanded] = useState(false);
 	const [openMap, setOpenMap] = useState<Record<string, boolean>>({});
 	const [deepestLevel, setDeepestLevel] = useState(0);
+	const [activeKey, setActiveKey] = useState<string | null>(null);
 
 	// ─── COMPUTE DEEPEST VISIBLE LEVEL ───────────────────────────────────────
 	// Walk the tree and find the deepest node that's currently open
@@ -335,6 +336,12 @@ export default function WorkshopNavigation({ onDepthChange, onSelect }: Workshop
 	useEffect(() => {
 		onDepthChange(deepestLevel);
 	}, [deepestLevel, onDepthChange]);
+
+	// ─── HANDLE SELECTION ────────────────────────────────────────────────────
+	const handleSelect = (contentKey: string) => {
+		setActiveKey(contentKey);
+		onSelect(contentKey);
+	};
 
 	// ─── CALCULATE EXPANDED WIDTH ────────────────────────────────────────────
 	const expandedWidth = BUTTON_WIDTH + PADDING * 2 + INDENT_PER_LEVEL * deepestLevel;
@@ -380,7 +387,8 @@ export default function WorkshopNavigation({ onDepthChange, onSelect }: Workshop
 									depth={0}
 									openMap={openMap}
 									toggleNode={toggleNode}
-									onSelect={onSelect}
+									onSelect={handleSelect}
+									activeKey={activeKey}
 								/>
 							))}
 					</div>
@@ -398,15 +406,23 @@ interface NavItemComponentProps {
 	openMap: Record<string, boolean>;
 	toggleNode: (title: string, depth: number) => void;
 	onSelect: (contentKey: string) => void;
+	activeKey: string | null;
 }
 
-function NavItemComponent({ item, depth, openMap, toggleNode, onSelect }: NavItemComponentProps) {
+function NavItemComponent({
+	item,
+	depth,
+	openMap,
+	toggleNode,
+	onSelect,
+	activeKey,
+}: NavItemComponentProps) {
 	const isOpen = openMap[item.title] || false;
 	const hasChildren = item.children && item.children.length > 0;
 	const [isHovered, setIsHovered] = React.useState(false);
 
-	// TODO: Track active/current route and set isActive = true when this item matches
-	const isActive = false;
+	// Active when this item's content key matches the currently selected key
+	const isActive = !!item.content && item.content === activeKey;
 
 	// ─── BUTTON STATE COLORS ─────────────────────────────────────────────────
 	let bgColor: string = theme.palette.silver2; // base
@@ -483,6 +499,7 @@ function NavItemComponent({ item, depth, openMap, toggleNode, onSelect }: NavIte
 								openMap={openMap}
 								toggleNode={toggleNode}
 								onSelect={onSelect}
+								activeKey={activeKey}
 							/>
 						))}
 				</div>

@@ -1,6 +1,17 @@
 // formEngineData.ts — nav structure + content file registry
 // Nav items 1 & 2 are Project Basics and Style Editor.
 // All other items follow as the rest of the orchestration system.
+//
+// TYPE ALIGNMENT NOTES (must match Formengine.types.ts exactly):
+//   - comment      (not helperText)
+//   - lines        (not rows)
+//   - default      (not defaultValue)
+//   - options: string[]  (not { label, value }[])
+//   - type: 'checkbox-group'  (not 'checkboxGroup')
+//   - type: 'sentence-list'   (not 'sentences')
+//   - type: 'tag-list'        (not 'tags')
+//   - SimpleListField requires itemType: 'text'
+//   - ObjectListField requires itemFields: FormField[]
 
 import { NavItem, ContentFiles } from '../types/Formengine.types';
 
@@ -13,7 +24,7 @@ export const navigation: NavItem[] = [
 	{
 		title: 'Style Editor',
 		order: 1,
-		content: '__style-editor__', // Special key — Workshop renders StyleEditor component, not a content file
+		content: '__style-editor__', // Special key — Workshop renders StyleEditor, not a ContentFile
 	},
 	{
 		title: 'Project Setup',
@@ -37,6 +48,7 @@ export const STYLE_EDITOR_KEY = '__style-editor__';
 export const PROJECT_BASICS_KEY = 'project-basics';
 
 export const contentFiles: ContentFiles = {
+	// ─── PROJECT BASICS ────────────────────────────────────────────────────────
 	'project-basics': {
 		title: 'Project Basics',
 		note: 'Define the core identity of this project — what it is, what it does, and what success looks like.',
@@ -47,7 +59,7 @@ export const contentFiles: ContentFiles = {
 				type: 'text',
 				order: 0,
 				placeholder: 'My Awesome Agent Project',
-				helperText: 'A short, memorable name for this project.',
+				comment: 'A short, memorable name for this project.',
 			},
 			{
 				id: 'project-description',
@@ -55,8 +67,8 @@ export const contentFiles: ContentFiles = {
 				type: 'textarea',
 				order: 1,
 				placeholder: 'Briefly describe what this project does...',
-				helperText: 'A 1–3 sentence summary of the project purpose.',
-				rows: 4,
+				comment: 'A 1–3 sentence summary of the project purpose.',
+				lines: 4,
 			},
 			{
 				id: 'project-goal',
@@ -64,8 +76,8 @@ export const contentFiles: ContentFiles = {
 				type: 'textarea',
 				order: 2,
 				placeholder: 'What does success look like for this project?',
-				helperText: 'The single most important outcome you want to achieve.',
-				rows: 3,
+				comment: 'The single most important outcome you want to achieve.',
+				lines: 3,
 			},
 			{
 				id: 'project-audience',
@@ -77,26 +89,22 @@ export const contentFiles: ContentFiles = {
 			{
 				id: 'project-tags',
 				label: 'Tags',
-				type: 'tags',
+				type: 'tag-list',
 				order: 4,
-				helperText: 'Keywords to help categorize and find this project.',
+				comment: 'Keywords to help categorize and find this project.',
 			},
 			{
 				id: 'project-status',
 				label: 'Status',
-				type: 'dropdown',
+				type: 'radio',
 				order: 5,
-				options: [
-					{ label: 'Draft', value: 'draft' },
-					{ label: 'In Progress', value: 'in-progress' },
-					{ label: 'Review', value: 'review' },
-					{ label: 'Complete', value: 'complete' },
-				],
-				defaultValue: 'draft',
+				options: ['Draft', 'In Progress', 'Review', 'Complete'],
+				default: 'Draft',
 			},
 		],
 	},
 
+	// ─── PROJECT IDENTITY ──────────────────────────────────────────────────────
 	'project-identity': {
 		title: 'Project Identity',
 		note: 'Define high-level project details that ground the entire agent configuration.',
@@ -114,30 +122,26 @@ export const contentFiles: ContentFiles = {
 				type: 'textarea',
 				order: 1,
 				placeholder: 'Describe what this project does...',
-				rows: 4,
+				lines: 4,
 			},
 			{
 				id: 'type',
 				label: 'Project Type',
 				type: 'dropdown',
 				order: 2,
-				options: [
-					{ label: 'Conversational Agent', value: 'conversational' },
-					{ label: 'Task Automation', value: 'automation' },
-					{ label: 'Content Generation', value: 'content' },
-					{ label: 'Data Analysis', value: 'analysis' },
-				],
+				options: ['Conversational Agent', 'Task Automation', 'Content Generation', 'Data Analysis'],
 			},
 			{
 				id: 'active',
 				label: 'Active Project',
 				type: 'toggle',
 				order: 3,
-				defaultValue: true,
+				default: true,
 			},
 		],
 	},
 
+	// ─── PROJECT ARCHITECTURE ──────────────────────────────────────────────────
 	'project-architecture': {
 		title: 'Architecture',
 		note: 'Define the technical structure and constraints of your agent system.',
@@ -147,44 +151,39 @@ export const contentFiles: ContentFiles = {
 				label: 'Primary Model',
 				type: 'dropdown',
 				order: 0,
-				options: [
-					{ label: 'Claude 3.5 Sonnet', value: 'claude-3-5-sonnet' },
-					{ label: 'Claude 3 Opus', value: 'claude-3-opus' },
-					{ label: 'Claude 3 Haiku', value: 'claude-3-haiku' },
-				],
+				options: ['Claude Sonnet 4', 'Claude Opus 4', 'Claude Haiku 4'],
 			},
 			{
+				// SimpleListField — itemType: 'text' is required to hit the right branch
 				id: 'constraints',
 				label: 'System Constraints',
 				type: 'list',
+				itemType: 'text',
 				order: 1,
-				helperText: 'Hard limits and requirements the system must respect.',
+				comment: 'Hard limits and requirements the system must respect.',
 			},
 			{
 				id: 'output-formats',
 				label: 'Output Formats',
-				type: 'checkboxGroup',
+				type: 'checkbox-group',
 				order: 2,
-				options: [
-					{ label: 'Markdown', value: 'markdown' },
-					{ label: 'JSON', value: 'json' },
-					{ label: 'Plain Text', value: 'plain' },
-					{ label: 'HTML', value: 'html' },
-				],
+				options: ['Markdown', 'JSON', 'Plain Text', 'HTML'],
 			},
 		],
 	},
 
+	// ─── AGENT ROLES ───────────────────────────────────────────────────────────
 	'agent-roles': {
 		title: 'Agent Roles',
 		note: 'Define the agents in your system, their responsibilities, and their nested capabilities.',
 		fields: [
 			{
+				// ObjectListField — itemFields required, no itemType
 				id: 'agents',
 				label: 'Agents',
 				type: 'list',
 				order: 0,
-				helperText:
+				comment:
 					'Add each agent in the system. Each agent can have capabilities which can have sub-capabilities.',
 				itemFields: [
 					{
@@ -199,10 +198,11 @@ export const contentFiles: ContentFiles = {
 						label: 'Role Description',
 						type: 'textarea',
 						order: 1,
-						rows: 3,
+						lines: 3,
 						placeholder: 'What is this agent responsible for?',
 					},
 					{
+						// Nested ObjectListField
 						id: 'agent-capabilities',
 						label: 'Capabilities',
 						type: 'list',
@@ -219,9 +219,10 @@ export const contentFiles: ContentFiles = {
 								label: 'Details',
 								type: 'textarea',
 								order: 1,
-								rows: 2,
+								lines: 2,
 							},
 							{
+								// Deepest level ObjectListField
 								id: 'cap-sub',
 								label: 'Sub-capabilities',
 								type: 'list',
@@ -242,6 +243,7 @@ export const contentFiles: ContentFiles = {
 		],
 	},
 
+	// ─── TOOLS & FUNCTIONS ─────────────────────────────────────────────────────
 	'tools-functions': {
 		title: 'Tools & Functions',
 		note: 'Define the tools and functions available to agents in this project.',
@@ -249,22 +251,16 @@ export const contentFiles: ContentFiles = {
 			{
 				id: 'tools',
 				label: 'Available Tools',
-				type: 'checkboxGroup',
+				type: 'checkbox-group',
 				order: 0,
-				options: [
-					{ label: 'Web Search', value: 'web-search' },
-					{ label: 'Code Execution', value: 'code-exec' },
-					{ label: 'File System', value: 'file-system' },
-					{ label: 'API Calls', value: 'api-calls' },
-					{ label: 'Database Query', value: 'db-query' },
-				],
+				options: ['Web Search', 'Code Execution', 'File System', 'API Calls', 'Database Query'],
 			},
 			{
 				id: 'custom-functions',
 				label: 'Custom Functions',
-				type: 'sentences',
+				type: 'sentence-list',
 				order: 1,
-				helperText: 'Define any custom functions this agent system can call.',
+				comment: 'Define any custom functions this agent system can call.',
 			},
 		],
 	},

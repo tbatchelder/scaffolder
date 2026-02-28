@@ -22,7 +22,7 @@ function ControlGroup({ label, children }: { label: string; children: React.Reac
 				style={{
 					fontSize: '12px',
 					fontWeight: 600,
-					color: 'var(--color-silver2)',
+					color: '#bfbfbf',
 					textTransform: 'uppercase',
 					letterSpacing: '0.06em',
 				}}
@@ -34,16 +34,26 @@ function ControlGroup({ label, children }: { label: string; children: React.Reac
 	);
 }
 
+// ─── CONTROLLER PANEL INPUT STYLES ───────────────────────────────────────────
+// Hardcoded values — the controller panel is always dark (emberBlack bg),
+// so inputs must always be white bg + black text regardless of user's theme
+// selections. Never use CSS variables here or the theme state bleeds in.
+
+const CTRL_BG = '#ffffff'; // always white input background
+const CTRL_TEXT = '#1a1a1a'; // always black text
+const CTRL_BORDER = '2px solid #1a1a1a';
+
 const selectStyle: React.CSSProperties = {
 	width: '100%',
-	backgroundColor: 'var(--color-silver)',
-	border: '2px solid var(--color-emberBlack)',
+	backgroundColor: CTRL_BG,
+	border: CTRL_BORDER,
 	borderRadius: '4px',
 	padding: '6px 8px',
-	color: 'var(--color-emberBlack)',
+	color: CTRL_TEXT,
 	fontSize: '13px',
 	fontWeight: 500,
 	cursor: 'pointer',
+	colorScheme: 'light', // forces OS dropdown popup to use light colors too
 };
 
 const colorPickerStyle: React.CSSProperties = {
@@ -51,18 +61,18 @@ const colorPickerStyle: React.CSSProperties = {
 	height: '36px',
 	padding: '2px',
 	borderRadius: '4px',
-	border: '2px solid var(--color-emberBlack)',
-	backgroundColor: 'var(--color-silver)',
+	border: CTRL_BORDER,
+	backgroundColor: CTRL_BG,
 	cursor: 'pointer',
 };
 
 const hexInputStyle: React.CSSProperties = {
 	width: '100%',
-	backgroundColor: 'var(--color-silver)',
-	border: '2px solid var(--color-emberBlack)',
+	backgroundColor: CTRL_BG,
+	border: CTRL_BORDER,
 	borderRadius: '4px',
 	padding: '5px 8px',
-	color: 'var(--color-emberBlack)',
+	color: CTRL_TEXT,
 	fontSize: '12px',
 	fontFamily: 'monospace',
 };
@@ -193,14 +203,7 @@ function CheckboxControl({
 					</span>
 				)}
 			</div>
-			<label
-				style={{
-					fontSize: '13px',
-					color: 'var(--color-silver)',
-					cursor: 'pointer',
-					userSelect: 'none',
-				}}
-			>
+			<label style={{ fontSize: '13px', color: '#d8d8d8', cursor: 'pointer', userSelect: 'none' }}>
 				{label}
 			</label>
 		</div>

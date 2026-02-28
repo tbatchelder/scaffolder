@@ -19,6 +19,7 @@ export default function Home() {
 	// ─── LOCAL UI STATE ──────────────────────────────────────────────────────
 	const [isOpened, setIsOpened] = useState(false);
 	const [showHero, setShowHero] = useState(true);
+	const [mounted, setMounted] = useState(false);
 
 	const [currentView, setCurrentView] = useState<
 		'gate' | 'first-run' | 'new-site' | 'gps' | 'clock-in' | 'workshop'
@@ -31,6 +32,12 @@ export default function Home() {
 	//   700ms: Doors fully open → fade out hero
 	//   1000ms: Hero gone → fade in the next view (FirstRun or ClockIn)
 	// ─────────────────────────────────────────────────────────────────────────
+
+	// Suppresses debug panel during SSR to prevent hydration mismatch.
+	// localStorage-derived state (hasPersistentData, currentUser) differs
+	// between server and client — mounted guard ensures we only render
+	// the debug panel after the client has hydrated.
+	useEffect(() => setMounted(true), []);
 
 	useEffect(() => {
 		if (isOpened) {
@@ -143,89 +150,92 @@ export default function Home() {
 			)}
 
 			{/* ═══ DEBUG TOOLBELT ════════════════════════════════════════════ */}
-			<div
-				className="fixed bottom-4 left-4 p-4 border-2 border-dashed opacity-30 hover:opacity-100 transition-opacity bg-black text-[10px] font-mono z-50"
-				style={{ borderColor: theme.palette.dragonYellow }}
-			>
-				<p
-					className="mb-2 uppercase font-bold text-center"
-					style={{ color: theme.palette.dragonYellow }}
+			{/* mounted guard: prevents hydration mismatch from localStorage-derived state */}
+			{mounted && (
+				<div
+					className="fixed bottom-4 left-4 p-4 border-2 border-dashed opacity-30 hover:opacity-100 transition-opacity bg-black text-[10px] font-mono z-50"
+					style={{ borderColor: theme.palette.dragonYellow }}
 				>
-					Admin Debug
-				</p>
-
-				{/* Status readout */}
-				<div className="mb-3 space-y-0.5 text-white/60 border-b border-white/10 pb-2">
-					<p>
-						HERO: {showHero ? 'VISIBLE' : 'GONE'} / OPENED: {isOpened ? 'YES' : 'NO'}
-					</p>
-					<p>VIEW: {currentView.toUpperCase()}</p>
-					<p>DATA: {hasPersistentData ? 'YES' : 'NO'}</p>
-					<p>USER: {getCurrentUserData()?.username ?? 'NONE'}</p>
-				</div>
-
-				{/* View jumping — bypasses hero gate entirely */}
-				<div className="flex flex-col gap-1.5">
-					<p className="text-white/40 uppercase text-[9px] tracking-wider">Jump to view</p>
-					<button
-						className="text-left px-2 py-1 hover:bg-white/10 rounded transition-colors text-white/70"
-						onClick={() => {
-							setShowHero(true);
-							setIsOpened(false);
-							setCurrentView('gate');
-						}}
-					>
-						→ GATE (reset hero)
-					</button>
-					<button
-						className="text-left px-2 py-1 hover:bg-white/10 rounded transition-colors text-white/70"
-						onClick={() => debugGoTo('first-run')}
-					>
-						→ FIRST RUN
-					</button>
-					<button
-						className="text-left px-2 py-1 hover:bg-white/10 rounded transition-colors text-white/70"
-						onClick={() => debugGoTo('new-site')}
-					>
-						→ NEW SITE
-					</button>
-					<button
-						className="text-left px-2 py-1 hover:bg-white/10 rounded transition-colors text-white/70"
-						onClick={() => debugGoTo('gps')}
-					>
-						→ GPS
-					</button>
-					<button
-						className="text-left px-2 py-1 hover:bg-white/10 rounded transition-colors text-white/70"
-						onClick={() => debugGoTo('clock-in')}
-					>
-						→ CLOCK IN
-					</button>
-					<button
-						className="text-left px-2 py-1 hover:bg-white/10 rounded transition-colors text-white/70"
-						onClick={() => debugGoTo('workshop')}
-					>
-						→ WORKSHOP
-					</button>
-
-					{/* Data controls */}
-					<p className="text-white/40 uppercase text-[9px] tracking-wider mt-2">Data controls</p>
-					<button
-						className="text-left px-2 py-1 hover:bg-white/10 rounded transition-colors"
+					<p
+						className="mb-2 uppercase font-bold text-center"
 						style={{ color: theme.palette.dragonYellow }}
-						onClick={debugSeedData}
 					>
-						⚡ SEED MOCK USERS
-					</button>
-					<button
-						className="text-left px-2 py-1 hover:bg-white/10 rounded transition-colors"
-						style={{ color: theme.palette.dragonRed }}
-						onClick={debugFullReset}
-					>
-						✕ FULL RESET
-					</button>
+						Admin Debug
+					</p>
+
+					{/* Status readout */}
+					<div className="mb-3 space-y-0.5 text-white/60 border-b border-white/10 pb-2">
+						<p>
+							HERO: {showHero ? 'VISIBLE' : 'GONE'} / OPENED: {isOpened ? 'YES' : 'NO'}
+						</p>
+						<p>VIEW: {currentView.toUpperCase()}</p>
+						<p>DATA: {hasPersistentData ? 'YES' : 'NO'}</p>
+						<p>USER: {getCurrentUserData()?.username ?? 'NONE'}</p>
+					</div>
+
+					{/* View jumping — bypasses hero gate entirely */}
+					<div className="flex flex-col gap-1.5">
+						<p className="text-white/40 uppercase text-[9px] tracking-wider">Jump to view</p>
+						<button
+							className="text-left px-2 py-1 hover:bg-white/10 rounded transition-colors text-white/70"
+							onClick={() => {
+								setShowHero(true);
+								setIsOpened(false);
+								setCurrentView('gate');
+							}}
+						>
+							→ GATE (reset hero)
+						</button>
+						<button
+							className="text-left px-2 py-1 hover:bg-white/10 rounded transition-colors text-white/70"
+							onClick={() => debugGoTo('first-run')}
+						>
+							→ FIRST RUN
+						</button>
+						<button
+							className="text-left px-2 py-1 hover:bg-white/10 rounded transition-colors text-white/70"
+							onClick={() => debugGoTo('new-site')}
+						>
+							→ NEW SITE
+						</button>
+						<button
+							className="text-left px-2 py-1 hover:bg-white/10 rounded transition-colors text-white/70"
+							onClick={() => debugGoTo('gps')}
+						>
+							→ GPS
+						</button>
+						<button
+							className="text-left px-2 py-1 hover:bg-white/10 rounded transition-colors text-white/70"
+							onClick={() => debugGoTo('clock-in')}
+						>
+							→ CLOCK IN
+						</button>
+						<button
+							className="text-left px-2 py-1 hover:bg-white/10 rounded transition-colors text-white/70"
+							onClick={() => debugGoTo('workshop')}
+						>
+							→ WORKSHOP
+						</button>
+
+						{/* Data controls */}
+						<p className="text-white/40 uppercase text-[9px] tracking-wider mt-2">Data controls</p>
+						<button
+							className="text-left px-2 py-1 hover:bg-white/10 rounded transition-colors"
+							style={{ color: theme.palette.dragonYellow }}
+							onClick={debugSeedData}
+						>
+							⚡ SEED MOCK USERS
+						</button>
+						<button
+							className="text-left px-2 py-1 hover:bg-white/10 rounded transition-colors"
+							style={{ color: theme.palette.dragonRed }}
+							onClick={debugFullReset}
+						>
+							✕ FULL RESET
+						</button>
+					</div>
 				</div>
-			</div>
+			)}
 		</main>
 	);
 }

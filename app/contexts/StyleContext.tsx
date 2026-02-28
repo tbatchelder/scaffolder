@@ -109,23 +109,23 @@ const defaultTypography: TypographyState = {
 	fontSize: 16,
 	fontWeight: 400,
 	lineHeight: 1.6,
-	color: '#1a1a1a',
+	color: '#ffffff', // white — preview lives on dark ember2 background
 	textDecoration: 'none',
 	textAlign: 'left',
 };
 
 const defaultColors: ColorsState = {
-	primary: '#e07b39',
+	primary: '#e07b39', // dragonOrange
 	secondary: '#64748b',
-	background: '#f5f5f5',
-	surface: '#ffffff',
-	accent: '#f5c842',
+	background: '#2a2a2a', // ember2 — dark so text shows on dark preview bg
+	surface: '#1a1a1a', // emberBlack
+	accent: '#f5c842', // dragonYellow
 };
 
 const defaultBorders: BordersState = {
 	width: 2,
 	radius: 8,
-	color: '#1a1a1a',
+	color: '#ffffff', // white — border cards sit on dark ember2 background
 	style: 'solid',
 };
 
@@ -135,19 +135,19 @@ const defaultSpacing: SpacingState = {
 };
 
 const defaultShadows: ShadowsState = {
-	intensity: 0.25,
+	intensity: 0.5,
 	blur: 20,
 	spread: 0,
-	color: '#000000',
+	color: '#ffffff', // white shadows — cards on dark bg need light shadows to show
 };
 
 const defaultBackgrounds: BackgroundsState = {
-	page: '#f5f5f5',
-	surface: '#ffffff',
-	accent: '#d8d8d8',
+	page: '#2a2a2a', // ember2 — dark default so text is readable
+	surface: '#1a1a1a', // emberBlack
+	accent: '#3a3a3a',
 	useGradient: false,
-	gradientFrom: '#f5f5f5',
-	gradientTo: '#d8d8d8',
+	gradientFrom: '#1a1a1a',
+	gradientTo: '#2a2a2a',
 	gradientDirection: 'to bottom',
 	pattern: 'none',
 };

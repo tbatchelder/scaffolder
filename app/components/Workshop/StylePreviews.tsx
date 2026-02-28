@@ -733,33 +733,48 @@ export function FormControlsPreview({
 }) {
 	const [hovered, setHovered] = React.useState(false);
 	const [focused, setFocused] = React.useState<string | null>(null);
+	const [radioVal, setRadioVal] = React.useState('option-a');
+	const [checked, setChecked] = React.useState(false);
+	const [toggled, setToggled] = React.useState(false);
 
 	const radiusMap: Record<string, string> = { sharp: '0px', rounded: '8px', pill: '999px' };
-	const densityMult = { tight: 0.75, normal: 1, spacious: 1.5 }[spacing.density];
-	const unit = spacing.base * densityMult;
+	const densityMult: Record<string, number> = { tight: 0.75, normal: 1, spacious: 1.5 };
+	const unit = spacing.base * densityMult[spacing.density];
 
 	const btnBase: React.CSSProperties = {
 		padding: `${unit * 0.75}px ${unit * 1.5}px`,
 		borderRadius: radiusMap[controls.cornerStyle],
 		fontFamily: typography.fontFamily,
 		fontSize: typography.fontSize + 'px',
-		fontWeight: typography.fontWeight,
+		fontWeight: 700,
 		transition: `all ${effects.transition}ms ease`,
 		cursor: 'pointer',
+		display: 'inline-block',
 	};
 
+	// Single button that reflects the currently-selected button style
 	const btnStyles: Record<string, React.CSSProperties> = {
-		filled: { backgroundColor: colors.primary, color: '#fff', border: 'none' },
+		filled: {
+			backgroundColor: colors.primary,
+			color: '#fff',
+			border: `2px solid ${colors.primary}`,
+		},
 		outline: {
 			backgroundColor: 'transparent',
 			color: colors.primary,
 			border: `2px solid ${colors.primary}`,
 		},
-		ghost: { backgroundColor: 'transparent', color: colors.primary, border: 'none' },
+		// Ghost: no bg, no border — underline makes it legible on any background
+		ghost: {
+			backgroundColor: 'transparent',
+			color: 'var(--color-silver)',
+			border: '2px solid transparent',
+			textDecoration: 'underline',
+		},
 	};
 
 	const hoverTransform: Record<string, React.CSSProperties> = {
-		lift: { transform: 'translateY(-2px)', boxShadow: '0 4px 12px rgba(0,0,0,0.25)' },
+		lift: { transform: 'translateY(-2px)', boxShadow: '0 4px 12px rgba(0,0,0,0.35)' },
 		darken: { filter: 'brightness(0.85)' },
 		lighten: { filter: 'brightness(1.15)' },
 		none: {},
@@ -775,43 +790,94 @@ export function FormControlsPreview({
 		backgroundColor: colors.surface,
 		color: typography.color,
 		outline: 'none',
+		boxSizing: 'border-box' as const,
 	};
 
 	const inputStyles: Record<string, React.CSSProperties> = {
 		filled: { border: 'none' },
 		outline: { border: `2px solid var(--color-silver2)` },
-		underline: { border: 'none', borderBottom: `2px solid ${colors.primary}`, borderRadius: 0 },
+		underline: {
+			border: 'none',
+			borderBottom: `2px solid ${colors.primary}`,
+			borderRadius: 0,
+			backgroundColor: 'transparent',
+		},
 	};
 
 	const focusStyle: React.CSSProperties = {
 		outline: `${controls.focusThickness}px solid ${controls.focusColor}`,
+		outlineOffset: '1px',
 		boxShadow: controls.focusGlow ? `0 0 8px ${controls.focusColor}55` : 'none',
 	};
 
+	const styleDescriptions: Record<string, string> = {
+		filled: 'Solid background, high contrast. Best for primary actions.',
+		outline: 'Transparent background with colored border. Secondary actions.',
+		ghost: 'No background or border. Subtle actions, shown here with underline for visibility.',
+	};
+
+	const inputDescriptions: Record<string, string> = {
+		filled: 'Surface-colored background, no border. Clean and minimal.',
+		outline: 'Surface background with visible border. Classic form look.',
+		underline: 'Transparent background, bottom border only. Modern/editorial style.',
+	};
+
+	// Custom toggle track + thumb
+	const toggleTrackStyle: React.CSSProperties = {
+		width: '44px',
+		height: '24px',
+		borderRadius: '12px',
+		backgroundColor: toggled ? colors.primary : 'var(--color-silver2)',
+		border: '2px solid var(--color-emberBlack)',
+		position: 'relative',
+		cursor: 'pointer',
+		transition: `background-color ${effects.transition}ms ease`,
+		flexShrink: 0,
+	};
+
+	const toggleThumbStyle: React.CSSProperties = {
+		position: 'absolute',
+		top: '2px',
+		left: toggled ? '22px' : '2px',
+		width: '16px',
+		height: '16px',
+		borderRadius: '50%',
+		backgroundColor: '#fff',
+		border: '1px solid rgba(0,0,0,0.2)',
+		transition: `left ${effects.transition}ms ease`,
+		boxShadow: '0 1px 3px rgba(0,0,0,0.3)',
+	};
+
+	// Checkbox radius: pill → clamp to 4px (full-round checkbox looks odd), else use cornerStyle
+	const checkRadius = controls.cornerStyle === 'pill' ? '4px' : radiusMap[controls.cornerStyle];
+
 	return (
 		<div className="space-y-8">
-			<PreviewSection title="Buttons">
-				<div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-					{(['filled', 'outline', 'ghost'] as const).map(style => (
-						<button
-							key={style}
-							style={{
-								...btnBase,
-								...btnStyles[style],
-								...(hovered ? hoverTransform[controls.hoverEffect] : {}),
-							}}
-							onMouseEnter={() => setHovered(true)}
-							onMouseLeave={() => setHovered(false)}
-						>
-							{style.charAt(0).toUpperCase() + style.slice(1)}
-						</button>
-					))}
-				</div>
+			{/* BUTTON — single button showing current style */}
+			<PreviewSection title={`Button Style: ${controls.buttonStyle}`}>
+				<p style={{ color: 'var(--color-silver2)', fontSize: '12px', marginBottom: '10px' }}>
+					{styleDescriptions[controls.buttonStyle]}
+				</p>
+				<button
+					style={{
+						...btnBase,
+						...btnStyles[controls.buttonStyle],
+						...(hovered ? hoverTransform[controls.hoverEffect] : {}),
+					}}
+					onMouseEnter={() => setHovered(true)}
+					onMouseLeave={() => setHovered(false)}
+				>
+					Example Button
+				</button>
 			</PreviewSection>
 
-			<PreviewSection title="Text Input">
+			{/* TEXT INPUT */}
+			<PreviewSection title={`Input Style: ${controls.inputStyle}`}>
+				<p style={{ color: 'var(--color-silver2)', fontSize: '12px', marginBottom: '10px' }}>
+					{inputDescriptions[controls.inputStyle]} — click to see focus ring.
+				</p>
 				<input
-					placeholder="Type something..."
+					placeholder="Click to see focus ring behavior..."
 					style={{
 						...inputBase,
 						...inputStyles[controls.inputStyle],
@@ -822,9 +888,10 @@ export function FormControlsPreview({
 				/>
 			</PreviewSection>
 
+			{/* TEXTAREA */}
 			<PreviewSection title="Textarea">
 				<textarea
-					placeholder="Multi-line text..."
+					placeholder="Multi-line input — same style as text input above..."
 					rows={3}
 					style={{
 						...inputBase,
@@ -837,39 +904,116 @@ export function FormControlsPreview({
 				/>
 			</PreviewSection>
 
-			<PreviewSection title="Checkbox & Toggle">
-				<div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
-					<label
-						style={{
-							display: 'flex',
-							alignItems: 'center',
-							gap: '8px',
-							color: 'var(--color-silver)',
-							cursor: 'pointer',
-						}}
-					>
-						<input
-							type="checkbox"
-							style={{ width: '18px', height: '18px', accentColor: colors.primary }}
-						/>
-						Checkbox
-					</label>
-					<label
-						style={{
-							display: 'flex',
-							alignItems: 'center',
-							gap: '8px',
-							color: 'var(--color-silver)',
-							cursor: 'pointer',
-						}}
-					>
-						<input
-							type="checkbox"
-							style={{ width: '36px', height: '18px', accentColor: colors.primary }}
-						/>
-						Toggle
-					</label>
+			{/* RADIO BUTTONS — custom styled, respects cornerStyle */}
+			<PreviewSection title="Radio Buttons">
+				<div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+					{['Option A', 'Option B', 'Option C'].map(opt => {
+						const val = opt.toLowerCase().replace(' ', '-');
+						const isSelected = radioVal === val;
+						return (
+							<label
+								key={val}
+								style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}
+								onClick={() => setRadioVal(val)}
+							>
+								<div
+									style={{
+										width: '18px',
+										height: '18px',
+										flexShrink: 0,
+										// Radios are always circular — cornerStyle only applies to sharp vs rounded
+										borderRadius: controls.cornerStyle === 'sharp' ? '2px' : '50%',
+										border: `2px solid ${isSelected ? colors.primary : 'var(--color-silver2)'}`,
+										backgroundColor: isSelected ? colors.primary : 'transparent',
+										display: 'flex',
+										alignItems: 'center',
+										justifyContent: 'center',
+										transition: `all ${effects.transition}ms ease`,
+									}}
+								>
+									{isSelected && (
+										<div
+											style={{
+												width: '6px',
+												height: '6px',
+												borderRadius: '50%',
+												backgroundColor: '#fff',
+											}}
+										/>
+									)}
+								</div>
+								<span
+									style={{
+										color: 'var(--color-silver)',
+										fontSize: typography.fontSize + 'px',
+										fontFamily: typography.fontFamily,
+									}}
+								>
+									{opt}
+								</span>
+							</label>
+						);
+					})}
 				</div>
+			</PreviewSection>
+
+			{/* CHECKBOX — square with checkmark, distinct from toggle */}
+			<PreviewSection title="Checkbox">
+				<label
+					style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}
+					onClick={() => setChecked(c => !c)}
+				>
+					<div
+						style={{
+							width: '20px',
+							height: '20px',
+							flexShrink: 0,
+							borderRadius: checkRadius,
+							border: `2px solid ${checked ? colors.primary : 'var(--color-silver2)'}`,
+							backgroundColor: checked ? colors.primary : 'transparent',
+							display: 'flex',
+							alignItems: 'center',
+							justifyContent: 'center',
+							transition: `all ${effects.transition}ms ease`,
+						}}
+					>
+						{checked && (
+							<span style={{ color: '#fff', fontSize: '13px', fontWeight: 900, lineHeight: 1 }}>
+								✓
+							</span>
+						)}
+					</div>
+					<span
+						style={{
+							color: 'var(--color-silver)',
+							fontSize: typography.fontSize + 'px',
+							fontFamily: typography.fontFamily,
+						}}
+					>
+						{checked ? 'Checked' : 'Unchecked'} — click to toggle
+					</span>
+				</label>
+			</PreviewSection>
+
+			{/* TOGGLE — pill track with sliding thumb, visually distinct from checkbox */}
+			<PreviewSection title="Toggle Switch">
+				<label
+					style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer' }}
+					onClick={() => setToggled(t => !t)}
+				>
+					<div style={toggleTrackStyle}>
+						<div style={toggleThumbStyle} />
+					</div>
+					<span
+						style={{
+							color: 'var(--color-silver)',
+							fontSize: typography.fontSize + 'px',
+							fontFamily: typography.fontFamily,
+						}}
+					>
+						{toggled ? 'On' : 'Off'} — click to toggle
+					</span>
+				</label>
 			</PreviewSection>
 		</div>
 	);
